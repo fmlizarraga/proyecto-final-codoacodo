@@ -3,7 +3,7 @@ from dotenv import dotenv_values
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from app.models import userDAO
+from app.models import userDAO, cartDAO
 
 dotenv_values()
 
@@ -26,6 +26,8 @@ def register_user(data):
     if new_user == None:
         return False, 'Ha ocurrido un error al tratar de registrar el usuario.', 500
     
+    cartDAO.create(new_user['id'])
+    
     return True, 'Usuario registrado correctamente.', 201
 
 def check_mail(email):
@@ -46,7 +48,7 @@ def login_user(email, password):
     password_matches = bcrypt.checkpw(plaintext_password,hashed_password)
     
     if password_matches:
-        token = generate_token(user["id"])
+        token = generate_token(user["id"], user["auth_lvl"])
         res_user = {
             "id": user["id"],
             "name": user["name"],
@@ -56,10 +58,11 @@ def login_user(email, password):
     
     return False, 'Credenciales incorrectas.', 401, False, False
 
-def generate_token(user_id):
+def generate_token(user_id, auth_lvl):
     expiration_time = datetime.utcnow() + timedelta(minutes=JWT_TOKEN_EXPIRATION_TIME_MINUTES)
     token_payload = {
         'user_id': user_id,
+        'auth_lvl': auth_lvl,
         'exp': expiration_time
     }
     token = jwt.encode(token_payload, JWT_SECRET_KEY, JWT_ALGORITHM)

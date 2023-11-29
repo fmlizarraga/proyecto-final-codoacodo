@@ -32,8 +32,6 @@ def requires_authorization(func):
                 return response
             
             # Si la autenticación es exitosa, se pasa a ejecutar la función de ruta
-            request.user_id = 1
-            
             return func(*args, **kwargs)
 
         # Si el encabezado no está presente o no tiene el formato correcto,
@@ -49,10 +47,17 @@ def verify_auth(token):
     try:
         # Decodificar el token
         decoded_token = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
+        user_id = decoded_token['user_id']
+        auth_lvl = decoded_token["auth_lvl"]
         # Verificar la validez del token
         # Consultar la base de datos para verificar la existencia del usuario
-        # Si el usuario exixte, se devuelve True
-        return auth.check_user_id(decoded_token['user_id'])
+        # Si el usuario exixte, se inyecta los datos del usuario en el objeto peticion y se devuelve True
+        if auth.check_user_id(user_id):
+            request.user_id = user_id
+            request.auth_lvl = auth_lvl
+            return True
+        # Si no, se devuelve False
+        return False
     except ExpiredSignatureError:
         # El token ha expirado
         print("Token expirado")

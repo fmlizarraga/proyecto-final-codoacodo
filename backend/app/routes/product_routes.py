@@ -13,6 +13,10 @@ def get_products():
 @product_bp.route('/api/products', methods=['POST'])
 @requires_authorization
 def create_product():
+    auth_lvl = request.auth_lvl
+    if not auth_lvl == 'admin':
+        return jsonify({"ok": False, "message": "Usuario no autorizado para realizar esta accion"}), 403
+    
     data = request.get_json() # Cuerpo de la peticion HTTP
     
     # validaciones del cuerpo de la peticion
@@ -29,6 +33,10 @@ def create_product():
 @product_bp.route('/api/products/<int:product_id>', methods=['PUT'])
 @requires_authorization
 def update_product(product_id):
+    auth_lvl = request.auth_lvl
+    if not auth_lvl == 'admin':
+        return jsonify({"ok": False, "message": "Usuario no autorizado para realizar esta accion"}), 403
+    
     data = request.get_json()
     
     if not validate_existent_product_data(data, product_id):
@@ -44,6 +52,9 @@ def update_product(product_id):
 @product_bp.route('/api/products/<int:product_id>', methods=['DELETE'])
 @requires_authorization
 def delete_product(product_id):
+    auth_lvl = request.auth_lvl
+    if not auth_lvl == 'admin':
+        return jsonify({"ok": False, "message": "Usuario no autorizado para realizar esta accion"}), 403
     
     if not isValidInt(product_id):
         return jsonify({"ok": False, "message": "Identificador de recurso invalido."}), 400
