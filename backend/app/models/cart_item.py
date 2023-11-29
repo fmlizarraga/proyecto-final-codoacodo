@@ -13,20 +13,29 @@ class Cart_Item:
     
     def update_quantity(self, cart_id, product_id, quantity):
         if quantity == 0:
+            # Si la cantidad es 0, borrar el producto del carrito
             return self.delete_by_product_id(cart_id, product_id)
         
         fetched = self.fetch_by_product_id(cart_id, product_id)
         if fetched is not None:
             # Si ya encontre items, actualizo la cantidad
-            sql = "UPDATE cart_items SET quantity = %s"
-            values = (quantity,)
+            
+            # Compruebo que la nueva cantidad no es la misma que la anterior
+            old_quantity = fetched['quantity']
+            if old_quantity == quantity:
+                print("La cantidad era la misma, no se realiza ningun cambio.")
+                return self.fetch_all_by_cart(cart_id)
+            
+            sql = "UPDATE cart_items SET quantity = %s WHERE product_id = %s"
+            values = (quantity, product_id)
             with self.db.conn.cursor() as cursor:
                 try:
                     cursor.execute(sql, values)
                     self.db.conn.commit()
                     if cursor.rowcount > 0:
-                        return self.fetch_by_product_id(cart_id, product_id)
+                        return self.fetch_all_by_cart(cart_id)
                     else:
+                        print("No se ha realizado ningun cambio")
                         return None
                 except Exception as e:
                     self.db.conn.rollback()
@@ -34,13 +43,13 @@ class Cart_Item:
                     return None
         else:
             # Si no encuentro ese item en el carrito, lo creo
-            sql = "INSERT INTO cart_items (product_id, cart_id) VALUES (%s, %s,)"
-            values = (product_id, cart_id)
+            sql = "INSERT INTO cart_items (product_id, cart_id, quantity) VALUES (%s, %s, %s)"
+            values = (product_id, cart_id, quantity)
             with self.db.conn.cursor() as cursor:
                 try:
                     cursor.execute(sql, values)
                     self.db.conn.commit()
-                    return self.fetch_by_product_id(cart_id, product_id)
+                    return self.fetch_all_by_cart(cart_id)
                 except Exception as e:
                     self.db.conn.rollback()
                     print(f"Error al crear item: {e}")
@@ -70,11 +79,13 @@ class Cart_Item:
             try:
                 cursor.execute(sql, values)
                 self.db.conn.commit()
-                return cursor.rowcount > 0
+                if not cursor.rowcount > 0:
+                    print("Nose hace nada.")
+                return self.fetch_all_by_cart(cart_id)
             except Exception as e:
                 self.db.conn.rollback()
                 print(f"Error al eliminar uno: {e}")
-                return False
+                return None
     
     def delete_all_by_cart_id(self, cart_id):
         sql = "DELETE FROM cart_items WHERE cart_id = %s"
@@ -84,7 +95,9 @@ class Cart_Item:
             try:
                 cursor.execute(sql, values)
                 self.db.conn.commit()
-                return cursor.rowcount > 0
+                if not cursor.rowcount > 0:
+                    print("Nose hace nada")
+                return True
             except Exception as e:
                 self.db.conn.rollback()
                 print(f"Error al eliminar todos: {e}")

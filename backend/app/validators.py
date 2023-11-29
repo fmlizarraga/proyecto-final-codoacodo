@@ -18,6 +18,9 @@ def isValidOrigin(value):
     if isNumber(value):
         return value > 0 and value < 110
 
+def isPositive(value):
+    return isValidInt(value) and value >= 0
+
 def validate_new_product_data(data):
     required_fields = ['title', 'description', 'price', 'img_url', 'origin']
 
@@ -65,6 +68,20 @@ def validate_login(data):
     password = data['password']
     
     if not isValidStr(email,0) or not isValidStr(password,0):
+        return False
+    
+    return True
+
+def validate_update_cart_item(data):
+    required_fienlds = ['id', 'quantity']
+    
+    if not all(field in data for field in required_fienlds):
+        return False
+    
+    item_id = data['id']
+    quantity = data['quantity']
+    
+    if not isPositive(item_id) or not isPositive(quantity):
         return False
     
     return True
