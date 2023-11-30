@@ -15,7 +15,7 @@ def check_cart(user_id):
 def format_cart_for_response(my_cart):
     return [
         {
-            "id": item["product_id"],
+            "product": productDAO.fetch_by_id(item["product_id"]),
             "quantity": item["quantity"]
         }
         for item in my_cart
