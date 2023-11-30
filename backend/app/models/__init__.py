@@ -6,6 +6,8 @@ from .user import User
 from .product import Product
 from .cart import Cart
 from .cart_item import Cart_Item
+from .order import Order
+from .order_item import Order_Item
 
 load_dotenv()
 MYSQL_HOST = os.environ.get('MYSQL_HOST')
@@ -20,7 +22,9 @@ db = Database(
     database=MYSQL_DB
 )
 
-userDAO = User(db=db)
-productDAO = Product(db=db)
-cartDAO = Cart(db=db)
-cartItemDAO = Cart_Item(db=db)
+userDAO = User(db)
+productDAO = Product(db)
+cartDAO = Cart(db)
+cartItemDAO = Cart_Item(db)
+orderDAO = Order(db)
+orderItemDAO = Order_Item(db)

@@ -1,3 +1,7 @@
+# Esquema de base de datos
+
+## Tablas
+
 ### Tabla de Usuarios (`users`):
 - **Campos:**
   - `id` (Clave primaria)
@@ -32,19 +36,19 @@
   - `id` (Clave primaria)
   - `user_id` (Clave foránea a `users`)
   - `order_date`
-  - `status` (puede ser 'pendiente', 'completado', etc.)
+  - `status` (pending | processing | shipped | delivered | cancelled)
 
-### Tabla de Detalles del Pedido (`order_details`):
+### Tabla de Detalles del Pedido (`order_items`):
 - **Campos:**
   - `order_id` (Clave foránea a `orders`)
   - `product_id` (Clave foránea a `products`)
   - `quantity`
 
-Con este esquema:
+## Con este esquema
 
 - La tabla `users` almacena información sobre los usuarios.
 - La tabla `products` almacena información sobre los productos disponibles.
 - La tabla `carts` almacena el carrito de cada usuario.
 - La tabla `cart_items` almacena los productos de cada carrito.
 - La tabla `orders` almacena información general sobre cada pedido.
-- La tabla `order_details` almacena los detalles específicos de los productos en cada pedido.
+- La tabla `order_items` almacena los detalles específicos de los productos en cada pedido.
