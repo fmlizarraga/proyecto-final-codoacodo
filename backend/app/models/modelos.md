@@ -36,7 +36,7 @@
   - `id` (Clave primaria)
   - `user_id` (Clave foránea a `users`)
   - `order_date`
-  - `status` (pending | processing | shipped | delivered | cancelled)
+  - `status` (pending | processing | shipped | delivered | cancelled - default: pending)
 
 ### Tabla de Detalles del Pedido (`order_items`):
 - **Campos:**
