@@ -8,7 +8,7 @@ from app.services import product_service as prsrv
 @requires_authorization
 def get_products():
     data = prsrv.fetch_products()
-    return jsonify({"ok":True, "message":"Productos recuperados correctamente", "data": data})
+    return jsonify({"ok":True, "message":"Productos recuperados correctamente", "products": data})
 
 @product_bp.route('/api/products', methods=['POST'])
 @requires_authorization
@@ -23,12 +23,9 @@ def create_product():
     if not validate_new_product_data(data):
         return jsonify({"ok": False, "message": "Alguno de los campos falta o esta en un formato incorrecto."}), 400
     
-    new_product = prsrv.create_product(data)
+    is_ok, msg, code, new_product = prsrv.create_product(data)
     
-    if new_product == None:
-        return jsonify({"ok": False, "message": "Hubo un problema al tratar de crear el producto."}), 503
-    
-    return jsonify({"ok":True, "product": new_product, "message": "Producto creado correctamente."}), 201
+    return jsonify({"ok": is_ok, "message": msg, "product": new_product}), code
 
 @product_bp.route('/api/products/<int:product_id>', methods=['PUT'])
 @requires_authorization

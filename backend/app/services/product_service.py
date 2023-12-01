@@ -18,10 +18,13 @@ def create_product(data):
     
     new_product = productDAO.create(title,description,price,img_url,origin)
     
+    if new_product == None:
+        return False, "Hubo un problema al tratar de crear el producto.", 503, None
+    
     if not new_product == None:
         new_product['price'] = float(new_product['price'])
     
-    return new_product
+    return True, "Producto creado correctamente.", 201, new_product
 
 def update_product(data, product_id):
     
