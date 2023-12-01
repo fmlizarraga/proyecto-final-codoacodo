@@ -4,7 +4,7 @@ from werkzeug.exceptions import NotFound
 from app.routes import auth_bp, product_bp, cart_bp, order_bp
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*", supports_credentials=True)
 
 @app.before_request
 def before_request():

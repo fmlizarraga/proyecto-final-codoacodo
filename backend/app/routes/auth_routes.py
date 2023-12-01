@@ -36,4 +36,4 @@ def login():
 def check():
     user_id = request.user_id
     token = authsrv.generate_token(user_id)
-    return jsonify({"ok": True, "token": token})
+    return jsonify({"ok": True, "message": "Autorizacion renovada correctamente.", "token": token})

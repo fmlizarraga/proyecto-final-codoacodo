@@ -48,21 +48,21 @@ def login_user(email, password):
     password_matches = bcrypt.checkpw(plaintext_password,hashed_password)
     
     if password_matches:
-        token = generate_token(user["id"], user["auth_lvl"])
+        token = generate_token(user["id"])
         res_user = {
             "id": user["id"],
             "name": user["name"],
-            "email": user["email"]
+            "email": user["email"],
+            "auth_lvl": user["auth_lvl"]
         }
         return True, 'Usuario autorizado.', 200, res_user, token
     
     return False, 'Credenciales incorrectas.', 401, False, False
 
-def generate_token(user_id, auth_lvl):
+def generate_token(user_id):
     expiration_time = datetime.utcnow() + timedelta(minutes=JWT_TOKEN_EXPIRATION_TIME_MINUTES)
     token_payload = {
         'user_id': user_id,
-        'auth_lvl': auth_lvl,
         'exp': expiration_time
     }
     token = jwt.encode(token_payload, JWT_SECRET_KEY, JWT_ALGORITHM)

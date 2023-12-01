@@ -19,7 +19,7 @@ Tienda online de productos importados
       ```json
       {
         "email": "test@test.com",
-        "password": 123456
+        "password": "123456"
       }
       ```
     - /api/auth [PUT] (Registrar usuario)
@@ -28,7 +28,7 @@ Tienda online de productos importados
       {
         "name": "test",
         "email": "test@test.com",
-        "password": 123456
+        "password": "123456"
       }
       ```
   - `Rutas para CRUD de productos`
