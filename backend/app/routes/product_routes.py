@@ -44,7 +44,7 @@ def update_product(product_id):
     if updated_product == None:
         return jsonify({"ok": False, "message": "Hubo un problema al tratar de actualizar el producto."}), 503
     
-    return jsonify({"ok":True,"product:": updated_product, "message": "Producto actualizado correctamente."})
+    return jsonify({"ok":True,"product": updated_product, "message": "Producto actualizado correctamente."})
 
 @product_bp.route('/api/products/<int:product_id>', methods=['DELETE'])
 @requires_authorization
@@ -65,4 +65,4 @@ def delete_product(product_id):
     if not is_deleted:
         return jsonify({"ok": False, "message": "Hubo un problema al tratar de borrar el producto."}), 503
     
-    return jsonify({"ok":True,"product:": product_id, "message": "Producto borrado correctamente."})
+    return jsonify({"ok":True,"product": product_id, "message": "Producto borrado correctamente."})
