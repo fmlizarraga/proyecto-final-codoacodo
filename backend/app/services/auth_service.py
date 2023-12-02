@@ -59,6 +59,22 @@ def login_user(email, password):
     
     return False, 'Credenciales incorrectas.', 401, False, False
 
+def check_user(user_id):
+    user = userDAO.fetch_by_id(user_id)
+    
+    if user == None:
+        return False, 'Usuario no encontrado.', 404, False, False
+    
+    token = generate_token(user["id"])
+    res_user = {
+        "id": user["id"],
+        "name": user["name"],
+        "email": user["email"],
+        "auth_lvl": user["auth_lvl"]
+    }
+    
+    return True, 'Autorizacion renovada correctamente.', 200, res_user, token
+
 def generate_token(user_id):
     expiration_time = datetime.utcnow() + timedelta(minutes=JWT_TOKEN_EXPIRATION_TIME_MINUTES)
     token_payload = {
