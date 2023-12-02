@@ -15,14 +15,29 @@
     <div id="app" class="container my-app">
         <header class="bg-dark text-white py-3 mb-2">
             <div class="container d-flex justify-content-between align-items-center">
-                <h1 class="mb-0">ImporTienda</h1>
+                <h1 class="mb-0 d-flex align-items-center">
+                    <i class="fa-solid fa-truck-plane me-2"></i>
+                    <span class="d-none d-md-block">ImporTienda</span>
+                </h1>                
                 <div v-if="status === 'logged'" class="d-flex align-items-center">
-                    <span class="me-3">Hola, {{ user.name }}!</span>
+                    <span class="me-3 d-none d-md-block">Hola, {{ user.name }}!</span>
                     <nav>
                         <div class="btn-group" role="group">
-                            <button v-if="user.auth_lvl === 'admin'" type="button" class="btn btn-outline-light">Nuevo Producto</button>
-                            <button type="button" class="btn btn-outline-light">Mi Carrito</button>
-                            <button @click="logOff" type="button" class="btn btn-outline-light">Salir</button>
+                            <button v-if="user.auth_lvl === 'admin'" type="button" class="btn btn-outline-light">
+                                <i class="fa-regular fa-square-plus"></i>
+                                Nuevo Producto
+                            </button>
+                            <button @click="toggleCart" 
+                                type="button" 
+                                :class="['btn btn-outline-light', { 'btn-success': showComponents.cart }]">
+                                <i v-show="!showComponents.cart" class="fa-solid fa-cart-shopping"></i>
+                                <i v-show="showComponents.cart" class="fa-solid fa-bag-shopping"></i>
+                                {{ showComponents.cart ? 'Productos' : 'Carrito' }} <span v-show="!showComponents.cart">{{ cartCount }}</span>
+                            </button>
+                            <button @click="logOff" type="button" class="btn btn-outline-light btn-danger">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                Salir
+                            </button>
                         </div>
                     </nav>
                 </div>
@@ -30,13 +45,15 @@
         </header>
 
         <div>
-            <login v-show="showComponents.login" @login="login" @register="register" ></login>
-            <products v-show="showComponents.products" :products="computedProducts" :auth_lvl="computedAuth" :url="url" ></products>
+            <login v-if="showComponents.login" @login="login" @register="register" ></login>
+            <products v-if="showComponents.products" :products="computedProducts" :auth_lvl="computedAuth" :url="url" ></products>
+            <cart v-if="showComponents.cart" :cart="cart"></cart>
         </div>
 
         <footer class="bg-dark text-white py-2 text-center">
             <div class="container">
-                <span class="d-block">2023 ImporTienda</span>
+                <i class="fa-regular fa-registered d-inline"></i>
+                <span class="d-inline"> 2023 ImporTienda</span>
             </div>
         </footer>
         

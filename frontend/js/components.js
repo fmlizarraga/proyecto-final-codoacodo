@@ -58,8 +58,38 @@ const loginForm = {
         },
         toggleRegister() {
             this.showRegister = !this.showRegister;
-            this.submitBtnTxt = 'Registrarme';
+            this.submitBtnTxt = this.showRegister ? 'Registrarme' : 'Iniciar sesión';
         }
+    }
+}
+
+const cartPage = {
+    template: `
+    <div>
+        <h2>
+            Carrito de compras
+        </h2>
+        <ul>
+            <li v-for="(cartItem, index) in cart" :key="index">
+                <img :src="cartItem.product.img_url" alt="Product Image">
+                <div>
+                    <h4>{{ cartItem.product.title }}</h4>
+                    <p>{{ cartItem.product.description }}</p>
+                    <p>Quantity: {{ cartItem.quantity }}</p>
+                    <p>Price: $ {{ cartItem.product.price }}</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    `,
+    props: ['cart'],
+    data() {
+        return {
+
+        }
+    },
+    methods: {
+        
     }
 }
 
@@ -72,12 +102,18 @@ const productItem = {
             <p class="card-text">{{ product.description }}</p>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Precio: {{ product.price }}</li>
+            <li class="list-group-item">Precio: $ {{ product.price }}</li>
             <li class="list-group-item">Origen: {{ getCountryName(product.origin) }}</li>
         </ul>
         <div class="card-body d-flex justify-content-between">
-            <button @click="onCartBtn" class="btn btn-success">Agregar</button>
-            <button @click="onAdminBtn" v-if="auth_lvl === 'admin'" class="btn btn-info">Administrar</button>
+            <button @click="onCartBtn" class="btn btn-success">
+                <i class="fa-solid fa-cart-plus"></i>
+                Agregar
+            </button>
+            <button @click="onAdminBtn" v-if="auth_lvl === 'admin'" class="btn btn-info">
+                <i class="fa-solid fa-wrench"></i>
+                Administrar
+            </button>
         </div>
     </div>
     `,
@@ -87,6 +123,7 @@ const productItem = {
             console.log(this.url);
             console.log(this.token)
             console.log("Carrito!");
+            // TODO emitir a addTocart, agregar data para enviar...
         },
         onAdminBtn() {
             console.log("Administrar!")

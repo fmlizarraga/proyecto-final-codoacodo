@@ -3,7 +3,8 @@ const { createApp } = Vue;
 const myApp = createApp({
     components: {
         'login': loginForm,
-        'products': productsList
+        'products': productsList,
+        'cart': cartPage
     },
     data() {
         return {
@@ -22,12 +23,14 @@ const myApp = createApp({
             showComponents: {
                 login: false,
                 products: false,
+                cart: false
             },
         }
     },
     mounted() {
-        this.showComponents.login = true
-        this.token = localStorage.getItem('token');
+        this.token = localStorage.getItem('token') || '';
+        if(this.token !== '') this.checkToken();
+        else this.showComponents.login = true;
     },
     computed: {
         computedProducts() {
@@ -36,7 +39,11 @@ const myApp = createApp({
         },
         computedAuth() {
             return this.user.auth_lvl;
-        }
+        },
+        cartCount() {
+            // Utiliza reduce para sumar las cantidades de todos los productos en el carrito
+            return this.cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
+        },
     },
     methods: {
         async login(form) {
@@ -56,6 +63,7 @@ const myApp = createApp({
             this.status = 'logged';
 
             await this.getProducts();
+            await this.getCart();
 
             this.showComponents.login = false
             this.showComponents.products = true
@@ -84,8 +92,18 @@ const myApp = createApp({
                 return;
             }
 
+            console.log(resp.data.message);
             this.token = resp.data.token;
             localStorage.setItem('token', resp.data.token);
+            
+            if (this.status !== 'logged') {
+                this.user = resp.data.user;
+                await this.getProducts();
+                await this.getCart();
+                this.showComponents.login = false
+                this.showComponents.products = true
+                this.status = 'logged';
+            }
         },
         logOff() {
             // Borro todos los datos, retorno a un estado inicial
@@ -98,6 +116,7 @@ const myApp = createApp({
                 auth_lvl: ''
             };
             this.products = [];
+            this.cart = [];
             this.showComponents.products = false;
             this.showComponents.login = true;
 
@@ -110,11 +129,45 @@ const myApp = createApp({
             console.log(resp.data.message);
 
             if(!isOk) {
-                alert('Hubo un problema al procesar la solicitud, por favor recargue la pagina.');
+                alert('Hubo un problema al recuperar la informacion, por favor recargue la pagina.');
                 this.products = [];
             }
 
             this.products = resp.data.products
+        },
+        toggleCart() {
+            this.showComponents.products = !this.showComponents.products;
+            this.showComponents.cart = !this.showComponents.products;
+        },
+        async getCart() {
+            const resp = await axios.get(`${this.url}/cart`,{headers:{"Authorization":`Bearer ${this.token}`}});
+            const isOk = resp.data.ok;
+
+            console.log(resp.data.message);
+
+            if(!isOk) {
+                alert('Hubo un problema al cargar su carrito, por favor recargue la pagina.');
+                this.cart = [];
+            }
+
+            this.cart = resp.data.cart;
+        },
+        async addToCart({itemId, quantity}) {
+            const foundItem = this.cart.find(cartItem => cartItem.product.id === itemId);
+            const oldQuantity = foundItem ? foundItem.quantity : 0;
+            const newQuantity = oldQuantity + quantity;
+
+            const resp = await axios.post(`${this.url}/cart`, {id: itemId, quantity: newQuantity},{headers:{"Authorization":`Bearer ${this.token}`}});
+            const isOk = resp.data.ok;
+
+            console.log(resp.data.message);
+
+            if(!isOk) {
+                alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                return;
+            }
+
+            this.cart = resp.data.cart;
         }
     }
 })
