@@ -4,7 +4,8 @@ const myApp = createApp({
     components: {
         'login': loginForm,
         'products': productsList,
-        'cart': cartPage
+        'cart': cartPage,
+        'newproduct': newProductForm
     },
     data() {
         return {
@@ -23,7 +24,8 @@ const myApp = createApp({
             showComponents: {
                 login: false,
                 products: false,
-                cart: false
+                cart: false,
+                newproduct: false
             },
         }
     },
@@ -47,62 +49,78 @@ const myApp = createApp({
     },
     methods: {
         async login(form) {
-            const resp = await axios.post(`${this.url}/auth`, form);
-            const isOk = resp.data.ok;
+            try {
+                const resp = await axios.post(`${this.url}/auth`, form);
+                const isOk = resp.data.ok;
 
-            if(!isOk) {
-                alert(resp.data.message);
-                return;
-            }
-            this.user = resp.data.user;
-            this.token = resp.data.token;
-            localStorage.setItem('token', resp.data.token);
-
-            console.log(resp.data.message);
-
-            this.status = 'logged';
-
-            await this.getProducts();
-            await this.getCart();
-
-            this.showComponents.login = false
-            this.showComponents.products = true
-        },
-        async register(form) {
-            console.log("registrando...")
-            const resp = await axios.put(`${this.url}/auth`,form);
-            const isOk = resp.data.ok;
-
-            console.log(resp.data.message);
-            alert(resp.data.message);
-            if(!isOk) {
-                alert('Ocurrio un problema, por favor intenta mas tarde.')
-                return;
-            }
-
-        },
-        async checkToken() {
-            const resp = await axios.get(`${this.url}/auth`,{headers:{"Authorization":`Bearer ${this.token}`}});
-            const isOk = resp.data.ok;
-
-            if(!isOk) {
-                console.log(resp.data.message);
-                alert("La sesion expiro.");
-                this.logOff();
-                return;
-            }
-
-            console.log(resp.data.message);
-            this.token = resp.data.token;
-            localStorage.setItem('token', resp.data.token);
-            
-            if (this.status !== 'logged') {
+                if(!isOk) {
+                    alert(resp.data.message);
+                    return;
+                }
                 this.user = resp.data.user;
+                this.token = resp.data.token;
+                localStorage.setItem('token', resp.data.token);
+
+                console.log(resp.data.message);
+
+                this.status = 'logged';
+
                 await this.getProducts();
                 await this.getCart();
+
                 this.showComponents.login = false
                 this.showComponents.products = true
-                this.status = 'logged';
+            } catch (err) {
+                console.log(err);
+                alert('No se pudo completar la operacion, por favor intente mas tarde.');
+            }
+            
+        },
+        async register(form) {
+            try {
+                const resp = await axios.put(`${this.url}/auth`,form);
+                const isOk = resp.data.ok;
+
+                console.log(resp.data.message);
+                alert(resp.data.message);
+                if(!isOk) {
+                    alert('Ocurrio un problema, por favor intente mas tarde.')
+                    return;
+                }
+            } catch (err) {
+                console.log(err);
+                alert('No se pudo completar la operacion, por favor intente mas tarde.');
+            }
+            
+        },
+        async checkToken() {
+            try {
+                const resp = await axios.get(`${this.url}/auth`,{headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
+    
+                if(!isOk) {
+                    console.log(resp.data.message);
+                    alert("La sesion expiro.");
+                    this.logOff();
+                    return;
+                }
+    
+                console.log(resp.data.message);
+                this.token = resp.data.token;
+                localStorage.setItem('token', resp.data.token);
+                
+                if (this.status !== 'logged') {
+                    this.user = resp.data.user;
+                    await this.getProducts();
+                    await this.getCart();
+                    this.showComponents.login = false
+                    this.showComponents.products = true
+                    this.status = 'logged';
+                }
+            } catch (err) {
+                console.log(err);
+                alert('Su secion expiro y se ha cerrado.')
+                this.logOff();
             }
         },
         logOff() {
@@ -123,7 +141,8 @@ const myApp = createApp({
             localStorage.clear();
         },
         async getProducts() {
-            const resp = await axios.get(`${this.url}/products`,{headers:{"Authorization":`Bearer ${this.token}`}});
+            try {
+                const resp = await axios.get(`${this.url}/products`,{headers:{"Authorization":`Bearer ${this.token}`}});
             const isOk = resp.data.ok;
 
             console.log(resp.data.message);
@@ -134,40 +153,85 @@ const myApp = createApp({
             }
 
             this.products = resp.data.products
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema al recuperar la informacion, por favor intente mas tarde, se cierra la sesion.')
+                this.logOff();
+            }
         },
         toggleCart() {
             this.showComponents.products = !this.showComponents.products;
             this.showComponents.cart = !this.showComponents.products;
         },
         async getCart() {
-            const resp = await axios.get(`${this.url}/cart`,{headers:{"Authorization":`Bearer ${this.token}`}});
-            const isOk = resp.data.ok;
+            try {
+                const resp = await axios.get(`${this.url}/cart`,{headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
 
-            console.log(resp.data.message);
+                console.log(resp.data.message);
 
-            if(!isOk) {
-                alert('Hubo un problema al cargar su carrito, por favor recargue la pagina.');
-                this.cart = [];
+                if(!isOk) {
+                    alert('Hubo un problema al cargar su carrito, por favor recargue la pagina.');
+                    this.cart = [];
+                }
+
+                this.cart = resp.data.cart;
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema al recuperar la informacion, por favor intente mas tarde, se cierra la sesion.')
+                this.logOff();
             }
-
-            this.cart = resp.data.cart;
+            
         },
-        async addToCart({itemId, quantity}) {
-            const foundItem = this.cart.find(cartItem => cartItem.product.id === itemId);
-            const oldQuantity = foundItem ? foundItem.quantity : 0;
-            const newQuantity = oldQuantity + quantity;
+        async sendtocart({itemId, quantity}) {
+            try {
+                const foundItem = this.cart.find(cartItem => cartItem.product.id === itemId);
+                const oldQuantity = foundItem ? foundItem.quantity : 0;
+                const newQuantity = oldQuantity + quantity;
 
-            const resp = await axios.post(`${this.url}/cart`, {id: itemId, quantity: newQuantity},{headers:{"Authorization":`Bearer ${this.token}`}});
-            const isOk = resp.data.ok;
+                const resp = await axios.post(`${this.url}/cart`, {id: itemId, quantity: newQuantity},{headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
 
-            console.log(resp.data.message);
+                console.log(resp.data.message);
 
-            if(!isOk) {
-                alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
-                return;
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                this.cart = resp.data.cart;
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
             }
+        },
+        addProductBtn() {
+            this.showComponents.newproduct = !this.showComponents.newproduct;
+        },
+        async createproduct(product) {
+            console.log('crear: ', product);
+        },
+        async editproduct(product) {
+            try {
+                const resp = await axios.put(`${this.url}/products/${product.id}`, product, {headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
 
-            this.cart = resp.data.cart;
+                console.log(resp.data.message);
+
+                
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                const updatedProduct = resp.data.product;
+
+                this.products = this.products.map((p) => p.id === updatedProduct.id ? updatedProduct : p);
+
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
+            }
         }
     }
 })

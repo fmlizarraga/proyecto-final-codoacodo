@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ImporTienda</title>
-    <link rel="shortcut icon" href="/resouces/favicon.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="/resources/favicon.svg" type="image/x-icon">
     <script src="https://kit.fontawesome.com/d385ce05bf.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -23,7 +23,7 @@
                     <span class="me-3 d-none d-md-block">Hola, {{ user.name }}!</span>
                     <nav>
                         <div class="btn-group" role="group">
-                            <button v-if="user.auth_lvl === 'admin'" type="button" class="btn btn-outline-light">
+                            <button v-if="user.auth_lvl === 'admin'" type="button" @click="addProductBtn" class="btn btn-outline-light">
                                 <i class="fa-regular fa-square-plus"></i>
                                 Nuevo Producto
                             </button>
@@ -46,8 +46,9 @@
 
         <div>
             <login v-if="showComponents.login" @login="login" @register="register" ></login>
-            <products v-if="showComponents.products" :products="computedProducts" :auth_lvl="computedAuth" :url="url" ></products>
-            <cart v-if="showComponents.cart" :cart="cart"></cart>
+            <newproduct v-if="showComponents.newproduct" ></newproduct>
+            <products v-if="showComponents.products" @sendtocart="sendtocart" @editproduct="editproduct" :products="computedProducts" :auth_lvl="computedAuth" :url="url"></products>
+            <cart v-if="showComponents.cart" :cart="cart" ></cart>
         </div>
 
         <footer class="bg-dark text-white py-2 text-center">
