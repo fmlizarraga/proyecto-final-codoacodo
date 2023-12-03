@@ -48,6 +48,34 @@ const myApp = createApp({
         },
     },
     methods: {
+        // Metodos basicos de UI
+        toggleCart() {
+            this.showComponents.products = !this.showComponents.products;
+            this.showComponents.cart = !this.showComponents.products;
+            this.showComponents.newproduct = false;
+        },
+        addproductbtn() {
+            this.showComponents.newproduct = !this.showComponents.newproduct;
+        },
+        logOff() {
+            // Borro todos los datos, retorno a un estado inicial
+            this.token = '';
+            this.status = 'not_logged';
+            this.user = {
+                id: 0,
+                name: '',
+                email: '',
+                auth_lvl: ''
+            };
+            this.products = [];
+            this.cart = [];
+            this.showComponents.products = false;
+            this.showComponents.login = true;
+
+            localStorage.clear();
+        },
+        // Llamadas al Backend
+        // Acciones de usuario - autorizacion
         async login(form) {
             try {
                 const resp = await axios.post(`${this.url}/auth`, form);
@@ -123,47 +151,7 @@ const myApp = createApp({
                 this.logOff();
             }
         },
-        logOff() {
-            // Borro todos los datos, retorno a un estado inicial
-            this.token = '';
-            this.status = 'not_logged';
-            this.user = {
-                id: 0,
-                name: '',
-                email: '',
-                auth_lvl: ''
-            };
-            this.products = [];
-            this.cart = [];
-            this.showComponents.products = false;
-            this.showComponents.login = true;
-
-            localStorage.clear();
-        },
-        async getProducts() {
-            try {
-                const resp = await axios.get(`${this.url}/products`,{headers:{"Authorization":`Bearer ${this.token}`}});
-            const isOk = resp.data.ok;
-
-            console.log(resp.data.message);
-
-            if(!isOk) {
-                alert('Hubo un problema al recuperar la informacion, por favor recargue la pagina.');
-                this.products = [];
-            }
-
-            this.products = resp.data.products
-            } catch (err) {
-                console.log(err);
-                alert('Hubo un problema al recuperar la informacion, por favor intente mas tarde, se cierra la sesion.')
-                this.logOff();
-            }
-        },
-        toggleCart() {
-            this.showComponents.products = !this.showComponents.products;
-            this.showComponents.cart = !this.showComponents.products;
-            this.showComponents.newproduct = false;
-        },
+        // Acciones de carrito
         async getCart() {
             try {
                 const resp = await axios.get(`${this.url}/cart`,{headers:{"Authorization":`Bearer ${this.token}`}});
@@ -184,11 +172,13 @@ const myApp = createApp({
             }
             
         },
-        async sendtocart({itemId, quantity}) {
+        async sendtocart({itemId, quantity, editing}) {
             try {
                 const foundItem = this.cart.find(cartItem => cartItem.product.id === itemId);
                 const oldQuantity = foundItem ? foundItem.quantity : 0;
                 const newQuantity = oldQuantity + quantity;
+
+                if(editing) newQuantity = quantity;
 
                 const resp = await axios.post(`${this.url}/cart`, {id: itemId, quantity: newQuantity},{headers:{"Authorization":`Bearer ${this.token}`}});
                 const isOk = resp.data.ok;
@@ -206,8 +196,25 @@ const myApp = createApp({
                 alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
             }
         },
-        addproductbtn() {
-            this.showComponents.newproduct = !this.showComponents.newproduct;
+        // crud de productos
+        async getProducts() {
+            try {
+                const resp = await axios.get(`${this.url}/products`,{headers:{"Authorization":`Bearer ${this.token}`}});
+            const isOk = resp.data.ok;
+
+            console.log(resp.data.message);
+
+            if(!isOk) {
+                alert('Hubo un problema al recuperar la informacion, por favor recargue la pagina.');
+                this.products = [];
+            }
+
+            this.products = resp.data.products
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema al recuperar la informacion, por favor intente mas tarde, se cierra la sesion.')
+                this.logOff();
+            }
         },
         async createproduct(product) {
             console.log('crear: ', product);
@@ -251,7 +258,6 @@ const myApp = createApp({
             }
         },
         async deleteproduct(productId) {
-            console.log(productId)
             try {
                 const resp = await axios.delete(`${this.url}/products/${productId}`, {headers:{"Authorization":`Bearer ${this.token}`}});
                 const isOk = resp.data.ok;
@@ -264,7 +270,7 @@ const myApp = createApp({
                 }
 
                 this.products = this.products.filter((p) => p.id !== productId);
-                
+
             } catch (err) {
                 console.log(err);
                 alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');

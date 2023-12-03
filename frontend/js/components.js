@@ -65,21 +65,38 @@ const loginForm = {
 
 const cartPage = {
     template: `
-    <div>
-        <h2>
-            Carrito de compras
-        </h2>
-        <ul>
-            <li v-for="(cartItem, index) in cart" :key="index">
-                <img :src="cartItem.product.img_url" alt="Product Image">
-                <div>
-                    <h4>{{ cartItem.product.title }}</h4>
-                    <p>{{ cartItem.product.description }}</p>
-                    <p>Quantity: {{ cartItem.quantity }}</p>
-                    <p>Price: $ {{ cartItem.product.price }}</p>
-                </div>
-            </li>
+    <div class="container animate__animated animate__fadeInRight">
+    <h2 class="mt-4 mb-4">Carrito de compras</h2>
+    <ul class="list-group">
+        <li v-for="(cartItem, index) in cart" :key="index" class="list-group-item">
+            <div class="row">
+            <div class="col-md-3">
+                <img :src="cartItem.product.img_url" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="col-md-9">
+                <h4>{{ cartItem.product.title }}</h4>
+                <p>{{ cartItem.product.description }}</p>
+                <button class="btn btn-outline-dark" >Cantidad: {{ cartItem.quantity }}</button>
+                <p class="mt-2 mr-1" >Precio: $ {{ cartItem.product.price }}</p>
+                <button class="btn btn-danger btn-sm mr-2">
+                    <i class="fa-solid fa-trash"></i>
+                    Quitar
+                </button>
+            </div>
+            </div>
+        </li>
         </ul>
+        <div class="mt-4">
+            <h4>Total: $ {{ calcularTotal() }}</h4>
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-success" @click="realizarOrden">
+                <i class="fas fa-check"></i> Realizar Orden
+                </button>
+                <button class="btn btn-danger ml-2" @click="limpiarCarrito">
+                <i class="fas fa-trash-alt"></i> Limpiar Carrito
+                </button>
+            </div>
+        </div>
     </div>
     `,
     props: ['cart'],
@@ -89,13 +106,24 @@ const cartPage = {
         }
     },
     methods: {
-        
+        calcularTotal() {
+            // Lógica para calcular el total del carrito
+            return this.cart.reduce((total, item) => total + item.quantity * item.product.price, 0).toFixed(2);
+        },
+        realizarOrden() {
+        // Lógica para realizar la orden
+        console.log('Orden realizada');
+        },
+        limpiarCarrito() {
+        // Lógica para limpiar el carrito
+        console.log("Limpiar el carrito");
+        },
     }
 }
 
 const newProductForm = {
     template: `
-    <div class="container bottom-border add-product-form">
+    <div class="container bottom-border add-product-form animate__animated animate__backInDown">
         <div class="row mt-4">
             <div class="col-12 col-sm-6">
                 <label for="formImgUrl" class="form-label">URL de la Imagen</label>
@@ -321,7 +349,7 @@ const newProductForm = {
 
 const productItem = {
     template: `
-    <div v-if="editingProduct" class="card" style="width: 18rem;">
+    <div v-if="editingProduct" class="card animate__animated animate__flipInY">
         <div class="card-body">
 
             <div class="mb-3">
@@ -350,15 +378,24 @@ const productItem = {
                 </select>
             </div>
             <div class="d-flex justify-content-between">
-                <button @click="onSaveProductBtn" class="btn btn-success">Guardar</button>
-                <button @click="onDeleteProductBtn" class="btn btn-danger">Borrar</button>
-                <button @click="onCancelAdminBtn" class="btn btn-secondary">Cancelar</button>
+                <button @click="onSaveProductBtn" class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Guardar
+                </button>
+                <button @click="onDeleteProductBtn" class="btn btn-danger btn-sm">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Borrar
+                </button>
+                <button @click="onCancelAdminBtn" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                    Cancelar
+                </button>
             </div>
 
         </div>
     </div>
 
-    <div v-if="!editingProduct" class="card" style="width: 18rem;">
+    <div v-if="!editingProduct" class="card animate__animated animate__fadeIn">
         <img :src="product.img_url" class="card-img-top" :alt="product.title">
         <div class="card-body">
             <h5 class="card-title">{{ product.title }}</h5>
@@ -378,7 +415,7 @@ const productItem = {
                 Administrar
             </button>
         </div>
-        <div v-if="settingQuant" class="card-body d-flex justify-content-between">
+        <div v-if="settingQuant" class="card-body d-flex justify-content-between animate__animated animate__flipInX">
             <div class="input-group">
                 <label for="quantity" class="form-label me-2">Cantidad:</label>
                 <input type="number" id="quantity" v-model="quantForm" class="form-control" required  min="1">
@@ -388,7 +425,7 @@ const productItem = {
                     <i class="fa-solid fa-cart-plus"></i>
                     Agregar
                 </button>
-                <button @click="onCancelCartBtn" class="btn btn-danger">
+                <button @click="onCancelCartBtn" class="btn btn-secondary">
                     <i class="fa-solid fa-xmark"></i>
                     Cancelar
                 </button>
@@ -397,6 +434,7 @@ const productItem = {
     </div>
     `,
     props: ['product', 'auth_lvl'],
+    emits: ['sendToCart', 'updateProduct', 'deleteProduct'],
     data() {
         return {
             // Para manejar carrito
@@ -683,7 +721,7 @@ const productItem = {
 
 const productsList = {
     template: `
-    <div class="container mt-5 product-list">
+    <div class="container mt-5 product-list animate__animated animate__fadeInLeft">
         <h2 class="mb-4">Productos</h2>
         <div class="row">
             <div v-for="product in products" :key="product.id" class="col-md-4">

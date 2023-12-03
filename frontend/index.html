@@ -29,12 +29,12 @@
                             </button>
                             <button @click="toggleCart" 
                                 type="button" 
-                                :class="['btn btn-outline-light', { 'btn-success': showComponents.cart }]">
+                                class="btn btn-outline-light">
                                 <i v-show="!showComponents.cart" class="fa-solid fa-cart-shopping"></i>
                                 <i v-show="showComponents.cart" class="fa-solid fa-bag-shopping"></i>
-                                {{ showComponents.cart ? 'Productos' : 'Carrito' }} <span v-show="!showComponents.cart">{{ cartCount }}</span>
+                                {{ showComponents.cart ? 'Productos' : 'Carrito' }} <span class="badge badge-pill badge-success" style="background-color: green;" v-show="!showComponents.cart">{{ cartCount }}</span>
                             </button>
-                            <button @click="logOff" type="button" class="btn btn-outline-light btn-danger">
+                            <button @click="logOff" type="button" class="btn btn-outline-danger">
                                 <i class="fa-solid fa-right-from-bracket"></i>
                                 Salir
                             </button>
