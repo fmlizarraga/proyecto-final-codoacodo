@@ -48,7 +48,7 @@
             <login v-if="showComponents.login" @login="login" @register="register" ></login>
             <newproduct v-if="showComponents.newproduct" @createproduct="createproduct" @addproductbtn="addproductbtn" ></newproduct>
             <products v-if="showComponents.products" @sendtocart="sendtocart" @editproduct="editproduct" @deleteproduct="deleteproduct" :products="computedProducts" :auth_lvl="computedAuth" :url="url"></products>
-            <cart v-if="showComponents.cart" :cart="cart" ></cart>
+            <cart v-if="showComponents.cart" :cart="cart" @removefromcart="removefromcart" @sendtocart="sendtocart" @clearcart="clearcart" @crearorden="crearorden" ></cart>
         </div>
 
         <footer class="bg-dark text-white py-2 text-center">

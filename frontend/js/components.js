@@ -76,19 +76,47 @@ const cartPage = {
             <div class="col-md-9">
                 <h4>{{ cartItem.product.title }}</h4>
                 <p>{{ cartItem.product.description }}</p>
-                <button class="btn btn-outline-dark" >Cantidad: {{ cartItem.quantity }}</button>
-                <p class="mt-2 mr-1" >Precio: $ {{ cartItem.product.price }}</p>
-                <button class="btn btn-danger btn-sm mr-2">
+
+                <button v-if="!showSetQuantity || cartItem.product.id !== selected"  
+                    class="btn btn-outline-dark" 
+                    @click="() => toggleOnSetQuantity(cartItem.product.id, cartItem.quantity)" >
+                    Cantidad: {{ cartItem.quantity }}
+                </button>
+                
+                <div v-if="showSetQuantity && cartItem.product.id === selected" class="form-inline d-flex align-items-center mt-2">
+                    <div class="form-group mb-2 flex-grow-0">
+                        <label for="inputQuantity" class="sr-only">Cantidad</label>
+                        <input type="number" class="form-control border border-primary" id="inputQuantity" v-model="formQuantity" style="max-width: 100px;">
+                    </div>
+                    <button class="btn btn-primary btn-sm mb-2 mx-2 flex-grow-0" @click="onSetItemQuantity" >Aceptar</button>
+                    <button class="btn btn-secondary btn-sm mb-2 mx-2 flex-grow-0" @click="toggleOffSetQuantity">Cancelar</button>
+                </div>
+                
+                <p class="mt-2 mx-2" >Precio: $ {{ cartItem.product.price }}</p>
+                <button v-if="!showRemoveQ || cartItem.product.id !== selected" @click="() => toggleOnRemoveQ(cartItem.product.id)" class="btn btn-danger btn-sm mx-2">
                     <i class="fa-solid fa-trash"></i>
                     Quitar
                 </button>
+                <div v-if="showRemoveQ && cartItem.product.id === selected" class="mt-2">
+                    <div class="alert alert-warning mt-2 py-1" role="alert">
+                        Estas seguro?
+                    </div>
+                    <button @click="onRemoveItem" class="btn btn-danger btn-sm mr-2">
+                        <i class="fa-solid fa-trash"></i>
+                        Si
+                    </button>
+                    <button @click="toggleOffRemoveQ" class="btn btn-secondary btn-sm mx-2">
+                        Cancelar
+                    </button>
+                </div>
             </div>
             </div>
         </li>
         </ul>
         <div class="mt-4">
             <h4>Total: $ {{ calcularTotal() }}</h4>
-            <div class="d-flex justify-content-between mt-4">
+
+            <div v-if="!showClearQ" class="d-flex justify-content-between mt-4">
                 <button class="btn btn-success" @click="realizarOrden">
                 <i class="fas fa-check"></i> Realizar Orden
                 </button>
@@ -96,13 +124,31 @@ const cartPage = {
                 <i class="fas fa-trash-alt"></i> Limpiar Carrito
                 </button>
             </div>
+
+            <div v-if="showClearQ" class="mt-2">
+                <div class="alert alert-warning mt-2 py-1" role="alert">
+                    Estas seguro?
+                </div>
+                <button @click="onClearCart" class="btn btn-danger btn-sm mr-2">
+                    <i class="fa-solid fa-trash"></i>
+                    Si
+                </button>
+                <button @click="limpiarCarrito" class="btn btn-secondary btn-sm mx-2">
+                    Cancelar
+                </button>
+            </div>
+
         </div>
     </div>
     `,
     props: ['cart'],
     data() {
         return {
-
+            showRemoveQ: false,
+            showClearQ: false,
+            showSetQuantity: false,
+            selected: -1,
+            formQuantity: 1
         }
     },
     methods: {
@@ -111,12 +157,46 @@ const cartPage = {
             return this.cart.reduce((total, item) => total + item.quantity * item.product.price, 0).toFixed(2);
         },
         realizarOrden() {
-        // Lógica para realizar la orden
-        console.log('Orden realizada');
+        alert('Orden realizada!');
+        this.onOrder();
         },
         limpiarCarrito() {
-        // Lógica para limpiar el carrito
-        console.log("Limpiar el carrito");
+        this.showClearQ = !this.showClearQ;
+        },
+        toggleOnRemoveQ(id) {
+            this.selected = id;
+            this.showRemoveQ = true;
+            this.showSetQuantity = false;
+        },
+        toggleOffRemoveQ() {
+            this.selected = -1;
+            this.showRemoveQ = false
+        },
+        toggleOnSetQuantity(id,quantity) {
+            this.selected = id;
+            this.formQuantity = quantity;
+            this.showRemoveQ = false;
+            this.showSetQuantity = true;
+        },
+        toggleOffSetQuantity() {
+            this.selected = -1;
+            this.formQuantity = 1;
+            this.showSetQuantity = false;
+        },
+        onRemoveItem() {
+            this.$emit('removefromcart', this.selected);
+            this.toggleOffRemoveQ();
+        },
+        onSetItemQuantity() {
+            this.$emit('sendtocart',{itemId: this.selected, quantity: this.formQuantity, editing: true});
+            this.toggleOffSetQuantity();
+        },
+        onClearCart() {
+            this.$emit('clearcart');
+            this.limpiarCarrito();
+        },
+        onOrder() {
+            this.$emit('crearorden');
         },
     }
 }

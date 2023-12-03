@@ -176,7 +176,7 @@ const myApp = createApp({
             try {
                 const foundItem = this.cart.find(cartItem => cartItem.product.id === itemId);
                 const oldQuantity = foundItem ? foundItem.quantity : 0;
-                const newQuantity = oldQuantity + quantity;
+                let newQuantity = oldQuantity + quantity;
 
                 if(editing) newQuantity = quantity;
 
@@ -196,7 +196,43 @@ const myApp = createApp({
                 alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
             }
         },
-        // crud de productos
+        async removefromcart(itemId) {
+            try {
+                const resp = await axios.delete(`${this.url}/cart/remove/${itemId}`,{headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
+
+                console.log(resp.data.message);
+
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                this.cart = resp.data.cart;
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
+            }
+        },
+        async clearcart() {
+            try {
+                const resp = await axios.delete(`${this.url}/cart/clear`,{headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
+
+                console.log(resp.data.message);
+
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                this.cart = [];
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
+            }
+        },
+        // CRUD de productos
         async getProducts() {
             try {
                 const resp = await axios.get(`${this.url}/products`,{headers:{"Authorization":`Bearer ${this.token}`}});
@@ -275,7 +311,11 @@ const myApp = createApp({
                 console.log(err);
                 alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
             }
-        }
+        },
+        // Ordenes de compra
+        async crearorden() {
+            console.log("orden creada!");
+        },
     }
 })
 
