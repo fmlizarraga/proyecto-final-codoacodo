@@ -339,7 +339,8 @@ const newProductForm = {
             this.$emit('addproductbtn', /* data */);
         },
         validateForm() {
-            return this.formImgUrl.length >= 3 &&
+            return this.formTitle.length >= 3 &&
+                this.formImgUrl.length >= 3 &&
                 this.formDescription.length >= 3 && 
                 this.formPrice && 
                 this.formOrigin;
@@ -585,6 +586,10 @@ const productItem = {
             this.editingProduct = true;
         },
         onSaveProductBtn() {
+            if(!this.validateForm()) {
+                alert('Por favor compruebe los valores antes de enviar el formulario.');
+                return;
+            }
             this.$emit('updateProduct',{id: this.product.id,
                 title: this.titleForm, 
                 description: this.descriptionForm,
@@ -599,6 +604,18 @@ const productItem = {
         },
         onCancelAdminBtn() {
             this.editingProduct = false;
+        },
+        validateForm() {
+            return (this.titleForm.length >= 3 &&
+                this.imgUrlForm.length >= 3 &&
+                this.descriptionForm.length >= 3 && 
+                this.priceForm && 
+                this.originForm) && 
+                (this.titleForm !== this.product.title || 
+                    this.descriptionForm !== this.product.description || 
+                    this.imgUrlForm !== this.product.img_url || 
+                    this.priceForm !== this.product.price || 
+                    this.originForm !== this.product.origin )
         },
         getCountryName(origin) {
             // Mapear el número de origen al país correspondiente
