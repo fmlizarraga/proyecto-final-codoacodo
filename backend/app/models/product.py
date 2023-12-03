@@ -1,6 +1,7 @@
 class Product:
     def __init__(self, db):
         self.db = db
+        self.db.create_origins_table()
         with self.db.conn.cursor() as cursor:
             cursor.execute('''CREATE TABLE IF NOT EXISTS products (
                 id INT AUTO_INCREMENT PRIMARY KEY,

@@ -1,23 +1,23 @@
 const loginForm = {
     template: `
-    <div class="container mt-5">
-        <div class="card form-container">
+    <div class="container login">
+        <div class="card form-container mx-auto col-md-6">
             <div class="card-body">
-                <form @submit.prevent="submitLoginForm" class="needs-validation">
+                <form @submit.prevent="submitLoginForm" class="needs-validation d-flex flex-column">
 
-                    <div v-if="showRegister" class="mb-3">
-                        <label for="name" class="form-label">Nombre:</label>
-                        <input type="text" id="name" v-model="form_name" class="form-control" required>
+                    <div v-if="showRegister" class="mb-3 d-flex flex-row align-items-center">
+                        <label for="name" class="form-label mx-1"><i class="fa-solid fa-user"></i></label>
+                        <input type="text" id="name" v-model="form_name" class="form-control" placeholder="Tu nombre" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email:</label>
-                        <input type="email" id="email" v-model="form_email" class="form-control" required>
+                    <div class="mb-3 d-flex flex-row align-items-center">
+                        <label for="email" class="form-label mx-1"><i class="fa-solid fa-envelope"></i></label>
+                        <input type="email" id="email" v-model="form_email" class="form-control" placeholder="Tu E-mail" required>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña:</label>
-                        <input type="password" id="password" v-model="form_password" class="form-control" required>
+                    <div class="mb-3 d-flex flex-row align-items-center">
+                        <label for="password" class="form-label mx-1"><i class="fa-solid fa-lock"></i></label>
+                        <input type="password" id="password" v-model="form_password" class="form-control" placeholder="Contraseña" required>
                     </div>
 
                     <button type="submit" class="btn btn-primary">{{ submitBtnTxt }}</button>
@@ -113,7 +113,7 @@ const cartPage = {
             </div>
         </li>
         </ul>
-        <div class="mt-4">
+        <div v-if="cart.length !== 0" class="mt-4">
             <h4>Total: $ {{ calcularTotal() }}</h4>
 
             <div v-if="!showClearQ" class="d-flex justify-content-between mt-4">
@@ -137,7 +137,10 @@ const cartPage = {
                     Cancelar
                 </button>
             </div>
-
+        </div>
+        <div v-if="cart.length === 0" class="mt-4 text-center">
+            <i class="fas fa-shopping-cart fa-5x mb-3"></i>
+            <h4>Tu carrito está vacío, ¡agrega algunos productos!</h4>
         </div>
     </div>
     `,

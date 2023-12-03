@@ -19,6 +19,7 @@ const myApp = createApp({
             },
             status: 'not_logged',
             products: [],
+            formFilter: '',
             cart: [],
             orders: [],
             showComponents: {
@@ -32,7 +33,12 @@ const myApp = createApp({
     mounted() {
         this.token = localStorage.getItem('token') || '';
         if(this.token !== '') this.checkToken();
-        else this.showComponents.login = true;
+        else {
+            this.showComponents.login = true;
+            this.showComponents.products = false;
+            this.showComponents.cart = false;
+            this.showComponents.newproduct = false;
+        }
     },
     computed: {
         computedProducts() {
@@ -44,17 +50,24 @@ const myApp = createApp({
         },
         cartCount() {
             // Utiliza reduce para sumar las cantidades de todos los productos en el carrito
-            return this.cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
+            if(this.cart) return this.cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
+            else return 0;
         },
+        filterProducts() {
+            if(this.formFilter !== '') return this.products.filter(prod => prod.title.toLowerCase().includes(this.formFilter.toLowerCase()));
+            else return this.products;
+        }
     },
     methods: {
         // Metodos basicos de UI
         toggleCart() {
+            this.formFilter = '';
             this.showComponents.products = !this.showComponents.products;
             this.showComponents.cart = !this.showComponents.products;
             this.showComponents.newproduct = false;
         },
         addproductbtn() {
+            this.formFilter = '';
             this.showComponents.newproduct = !this.showComponents.newproduct;
         },
         logOff() {
@@ -69,8 +82,10 @@ const myApp = createApp({
             };
             this.products = [];
             this.cart = [];
-            this.showComponents.products = false;
             this.showComponents.login = true;
+            this.showComponents.products = false;
+            this.showComponents.cart = false;
+            this.showComponents.newproduct = false;
 
             localStorage.clear();
         },
@@ -137,14 +152,15 @@ const myApp = createApp({
                 this.token = resp.data.token;
                 localStorage.setItem('token', resp.data.token);
                 
+                this.user = resp.data.user;
                 if (this.status !== 'logged') {
-                    this.user = resp.data.user;
                     await this.getProducts();
                     await this.getCart();
                     this.showComponents.login = false
                     this.showComponents.products = true
                     this.status = 'logged';
                 }
+                console.log(this.user)
             } catch (err) {
                 console.log(err);
                 alert('Su secion expiro y se ha cerrado.')

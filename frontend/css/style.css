@@ -1,7 +1,12 @@
+body {
+    height: 100%;
+}
+
 .my-app {
     margin: 0;
     padding: 0;
     max-width: 100%;
+    max-height: 100%;
 }
 
 header {
@@ -30,7 +35,7 @@ footer {
 }
 
 .body-content {
-    margin-top: 90px;
+    margin-top: 120px;
     margin-bottom: 60px;
 }
 
@@ -40,4 +45,9 @@ footer {
     right: 50px;
     z-index: 10;
     background-color: rgba(255, 255, 255, 0.938);
+}
+
+.login {
+    position: fixed;
+    top: 20%;
 }
