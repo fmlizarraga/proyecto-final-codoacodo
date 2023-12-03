@@ -95,74 +95,227 @@ const cartPage = {
 
 const newProductForm = {
     template: `
-    <div class="container">
-        <form>
-            <div class="row mt-4">
-                <div class="col-12 col-sm-6">
-                    <label for="formFile" class="form-label">Foto</label>
-                    <input id="formFile" v-model="formImg" class="form-control form-control-sm" onchange="mostrarVistaPrevia()" type="file">
-                    <div class="mt-3">
-                        <img src="./resources/default-img.png" id="preview" class="img-thumbnail img-preview" alt="...">
-                    </div>
+    <div class="container bottom-border add-product-form">
+        <div class="row mt-4">
+            <div class="col-12 col-sm-6">
+                <label for="formImgUrl" class="form-label">URL de la Imagen</label>
+                <input id="formImgUrl" class="form-control form-control-sm" v-model="formImgUrl" @input="updatePreview" type="text">
+                <div class="mt-3">
+                    <img :src="imgPreview" id="preview" class="img-thumbnail img-preview" alt="Vista Previa">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 col-sm-6">
+                <div class="form-group">
+                    <label for="newtitle" class="form-label">Titulo</label>
+                    <input id="newtitle" v-model="formTitle" class="form-control" @input="updateValidation" type="text">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="newdescription" class="form-label">Descripción</label>
+                    <input id="newdescription" v-model="formDescription" class="form-control" @input="updateValidation" type="text">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                <div class="form-group">
+                    <label for="newprice" class="form-label">Precio</label>
+                    <input id="newprice" v-model="formPrice" class="form-control" @input="updateValidation" type="number">
                 </div>
             </div>
 
-            <div class="row mt-4">
-                <div class="col-12 col-sm-6">
-                    <div class="form-group">
-                        <label for="newtitle" class="form-label">Titulo</label>
-                        <input id="newtitle" v-model="formTitle" class="form-control" type="text">
-                    </div>
+            <div class="col-12 col-sm-6">
+                <div class="form-group">
+                    <label for="neworigin" class="form-label">Origen</label>
+
+                    <select id="origin" v-model="formOrigin" class="form-select" required>
+                        <option value="" disabled>Selecciona un país</option>
+                        <option v-for="(country, index) in countries" :key="index" :value="country.id">
+                            {{ country.name }}
+                        </option>
+                    </select>
+
                 </div>
             </div>
+        </div>
 
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label for="newdescription" class="form-label">Descripción</label>
-                        <input id="newdescription" v-model="formDescription" class="form-control" type="text">
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-6">
+                <button class="btn btn-success mt-4" @click="onCreateProductBtn" :disabled="!isValidForm">Crear</button>
             </div>
-
-            <div class="row">
-                <div class="col-12 col-sm-6">
-                    <div class="form-group">
-                        <label for="newprice" class="form-label">Precio</label>
-                        <input id="newprice" v-model="formPrice" class="form-control" type="number">
-                    </div>
-                </div>
-
-                <div class="col-12 col-sm-6">
-                    <div class="form-group">
-                        <label for="neworigin" class="form-label">Origen</label>
-                        <input id="neworigin" v-model="formOrigin" class="form-control" type="number">
-                    </div>
-                </div>
+            <div class="col-6">
+                <button class="btn btn-secondary mt-4" @click="onCancelCreateBtn">Cancelar</button>
             </div>
-
-            <div class="row">
-                <div class="col-6">
-                    <button class="btn btn-success mt-4" @click="createProductBtn">Crear</button>
-                </div>
-                <div class="col-6">
-                    <button class="btn btn-secondary mt-4" @click="cancelCreateBtn">Cancelar</button>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
     `,
     data() {
         return {
+            isValidForm: false,
             formTitle: '',
             formDescription: '',
-            formImg: '',
+            formImgUrl: '',
+            imgPreview: './resources/default-img.png',
             formPrice: 0,
             formOrigin: 1,
+            countries: [
+                {id: 1, name: 'Afganistán'},
+                {id: 2, name: 'Argelia'},
+                {id: 3, name: 'Samoa Americana'},
+                {id: 4, name: 'Angola'},
+                {id: 5, name: 'Anguila'},
+                {id: 6, name: 'Argentina'},
+                {id: 7, name: 'Armenia'},
+                {id: 8, name: 'Australia'},
+                {id: 9, name: 'Austria'},
+                {id: 10, name: 'Azerbaiyán'},
+                {id: 11, name: 'Baréin'},
+                {id: 12, name: 'Bangladés'},
+                {id: 13, name: 'Bielorrusia'},
+                {id: 14, name: 'Bolivia'},
+                {id: 15, name: 'Brasil'},
+                {id: 16, name: 'Brunéi'},
+                {id: 17, name: 'Bulgaria'},
+                {id: 18, name: 'Camboya'},
+                {id: 19, name: 'Camerún'},
+                {id: 20, name: 'Canadá'},
+                {id: 21, name: 'Chad'},
+                {id: 22, name: 'Chile'},
+                {id: 23, name: 'China'},
+                {id: 24, name: 'Colombia'},
+                {id: 25, name: 'República Democrática del Congo'},
+                {id: 26, name: 'República Checa'},
+                {id: 27, name: 'República Dominicana'},
+                {id: 28, name: 'Ecuador'},
+                {id: 29, name: 'Egipto'},
+                {id: 30, name: 'Estonia'},
+                {id: 31, name: 'Etiopía'},
+                {id: 32, name: 'Islas Feroe'},
+                {id: 33, name: 'Finlandia'},
+                {id: 34, name: 'Francia'},
+                {id: 35, name: 'Guayana Francesa'},
+                {id: 36, name: 'Polinesia Francesa'},
+                {id: 37, name: 'Gambia'},
+                {id: 38, name: 'Alemania'},
+                {id: 39, name: 'Grecia'},
+                {id: 40, name: 'Groenlandia'},
+                {id: 41, name: 'Ciudad del Vaticano'},
+                {id: 42, name: 'Hong Kong'},
+                {id: 43, name: 'Hungría'},
+                {id: 44, name: 'India'},
+                {id: 45, name: 'Indonesia'},
+                {id: 46, name: 'Irán'},
+                {id: 47, name: 'Irak'},
+                {id: 48, name: 'Israel'},
+                {id: 49, name: 'Italia'},
+                {id: 50, name: 'Japón'},
+                {id: 51, name: 'Kazajistán'},
+                {id: 52, name: 'Kenia'},
+                {id: 53, name: 'Kuwait'},
+                {id: 54, name: 'Letonia'},
+                {id: 55, name: 'Liechtenstein'},
+                {id: 56, name: 'Lituania'},
+                {id: 57, name: 'Madagascar'},
+                {id: 58, name: 'Malaui'},
+                {id: 59, name: 'Malasia'},
+                {id: 60, name: 'México'},
+                {id: 61, name: 'Moldavia'},
+                {id: 62, name: 'Marruecos'},
+                {id: 63, name: 'Mozambique'},
+                {id: 64, name: 'Birmania'},
+                {id: 65, name: 'Nauru'},
+                {id: 66, name: 'Nepal'},
+                {id: 67, name: 'Países Bajos'},
+                {id: 68, name: 'Nueva Zelanda'},
+                {id: 69, name: 'Nigeria'},
+                {id: 70, name: 'Corea del Norte'},
+                {id: 71, name: 'Omán'},
+                {id: 72, name: 'Pakistán'},
+                {id: 73, name: 'Paraguay'},
+                {id: 74, name: 'Perú'},
+                {id: 75, name: 'Filipinas'},
+                {id: 76, name: 'Polonia'},
+                {id: 77, name: 'Puerto Rico'},
+                {id: 78, name: 'Rumanía'},
+                {id: 79, name: 'Reunión'},
+                {id: 80, name: 'Federación de Rusia'},
+                {id: 81, name: 'San Vicente y las Granadinas'},
+                {id: 82, name: 'Arabia Saudita'},
+                {id: 83, name: 'Senegal'},
+                {id: 84, name: 'Eslovaquia'},
+                {id: 85, name: 'Sudáfrica'},
+                {id: 86, name: 'Corea del Sur'},
+                {id: 87, name: 'España'},
+                {id: 88, name: 'Sri Lanka'},
+                {id: 89, name: 'Sudán'},
+                {id: 90, name: 'Suecia'},
+                {id: 91, name: 'Suiza'},
+                {id: 92, name: 'Taiwán'},
+                {id: 93, name: 'Tanzania'},
+                {id: 94, name: 'Tailandia'},
+                {id: 95, name: 'Tonga'},
+                {id: 96, name: 'Túnez'},
+                {id: 97, name: 'Turquía'},
+                {id: 98, name: 'Turkmenistán'},
+                {id: 99, name: 'Tuvalu'},
+                {id: 100, name: 'Ucrania'},
+                {id: 101, name: 'Emiratos Árabes Unidos'},
+                {id: 102, name: 'Reino Unido'},
+                {id: 103, name: 'Estados Unidos'},
+                {id: 104, name: 'Venezuela'},
+                {id: 105, name: 'Vietnam'},
+                {id: 106, name: 'Islas Vírgenes de los Estados Unidos'},
+                {id: 107, name: 'Yemen'},
+                {id: 108, name: 'Yugoslavia'},
+                {id: 109, name: 'Zambia'}
+            ]
         }
     },
     methods: {
-        
+        updatePreview() {
+            this.imgPreview = this.formImgUrl;
+            if(this.formImgUrl === '') this.imgPreview = './resources/default-img.png';
+            this.isValidForm = this.validateForm();
+        },
+        updateValidation() {
+            this.isValidForm = this.validateForm();
+        },
+        onCreateProductBtn() {
+            this.$emit('createproduct', {
+                title: this.formTitle,
+                description: this.formDescription,
+                img_url: this.formImgUrl,
+                price: this.formPrice,
+                origin: this.formOrigin
+            });
+
+            this.isValidForm = false;
+            this.formTitle = '';
+            this.formDescription = '';
+            this.formImgUrl = '';
+            this.imgPreview = './resources/default-img.png';
+            this.formPrice = 0;
+            this.formOrigin = 1;
+
+            this.$emit('addproductbtn', /* data */);
+        },
+        onCancelCreateBtn() {
+            this.$emit('addproductbtn', /* data */);
+        },
+        validateForm() {
+            return this.formImgUrl.length >= 3 &&
+                this.formDescription.length >= 3 && 
+                this.formPrice && 
+                this.formOrigin;
+        },
     }
 }
 
@@ -170,38 +323,38 @@ const productItem = {
     template: `
     <div v-if="editingProduct" class="card" style="width: 18rem;">
         <div class="card-body">
-            <form>
-                <div class="mb-3">
-                    <label for="title" class="form-label">Título:</label>
-                    <input type="text" id="title" v-model="titleForm" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Descripción:</label>
-                    <input type="text" id="description" v-model="descriptionForm" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="imgUrl" class="form-label">URL de la imagen:</label>
-                    <input type="text" id="imgUrl" v-model="imgUrlForm" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="price" class="form-label">Precio:</label>
-                    <input type="number" id="price" v-model="priceForm" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="origin" class="form-label">Origen:</label>
-                    <select id="origin" v-model="originForm" class="form-select" required>
-                        <option value="" disabled>Selecciona un país</option>
-                        <option v-for="(country, index) in countries" :key="index" :value="country.id">
-                            {{ country.name }}
-                        </option>
-                    </select>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button @click="onSaveProductBtn" class="btn btn-success">Guardar</button>
-                    <button @click="onDeleteProductBtn" class="btn btn-danger">Borrar</button>
-                    <button @click="onCancelAdminBtn" class="btn btn-secondary">Cancelar</button>
-                </div>
-            </form>
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Título:</label>
+                <input type="text" id="title" v-model="titleForm" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Descripción:</label>
+                <input type="text" id="description" v-model="descriptionForm" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="imgUrl" class="form-label">URL de la imagen:</label>
+                <input type="text" id="imgUrl" v-model="imgUrlForm" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Precio:</label>
+                <input type="number" id="price" v-model="priceForm" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="origin" class="form-label">Origen:</label>
+                <select id="origin" v-model="originForm" class="form-select" required>
+                    <option value="" disabled>Selecciona un país</option>
+                    <option v-for="(country, index) in countries" :key="index" :value="country.id">
+                        {{ country.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button @click="onSaveProductBtn" class="btn btn-success">Guardar</button>
+                <button @click="onDeleteProductBtn" class="btn btn-danger">Borrar</button>
+                <button @click="onCancelAdminBtn" class="btn btn-secondary">Cancelar</button>
+            </div>
+
         </div>
     </div>
 
@@ -404,7 +557,7 @@ const productItem = {
             this.editingProduct = false;
         },
         onDeleteProductBtn() {
-            console.log('delete: ', this.product.id);
+            this.$emit('deleteProduct', this.product.id)
         },
         onCancelAdminBtn() {
             this.editingProduct = false;
@@ -530,12 +683,12 @@ const productItem = {
 
 const productsList = {
     template: `
-    <div class="container mt-5">
+    <div class="container mt-5 product-list">
         <h2 class="mb-4">Productos</h2>
         <div class="row">
             <div v-for="product in products" :key="product.id" class="col-md-4">
                 <div class="mb-4">
-                    <product :product="product" :auth_lvl="auth_lvl" @sendToCart="handleAddToCart" @updateProduct="handleUpdateProduct"></product>
+                    <product :product="product" :auth_lvl="auth_lvl" @sendToCart="handleAddToCart" @updateProduct="handleUpdateProduct" @deleteProduct="handleDeleteProduct"></product>
                 </div>
             </div>
         </div>
@@ -557,6 +710,9 @@ const productsList = {
         },
         handleUpdateProduct(form) {
             this.$emit('editproduct', form);
+        },
+        handleDeleteProduct(data) {
+            this.$emit('deleteproduct', data);
         }
     },
 }

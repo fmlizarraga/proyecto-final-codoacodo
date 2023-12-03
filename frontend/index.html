@@ -13,7 +13,7 @@
 </head>
 <body>
     <div id="app" class="container my-app">
-        <header class="bg-dark text-white py-3 mb-2">
+        <header class="bg-dark text-white py-3">
             <div class="container d-flex justify-content-between align-items-center">
                 <h1 class="mb-0 d-flex align-items-center">
                     <i class="fa-solid fa-truck-plane me-2"></i>
@@ -23,7 +23,7 @@
                     <span class="me-3 d-none d-md-block">Hola, {{ user.name }}!</span>
                     <nav>
                         <div class="btn-group" role="group">
-                            <button v-if="user.auth_lvl === 'admin'" type="button" @click="addProductBtn" class="btn btn-outline-light">
+                            <button v-if="user.auth_lvl === 'admin'" type="button" @click="addproductbtn" class="btn btn-outline-light">
                                 <i class="fa-regular fa-square-plus"></i>
                                 Nuevo Producto
                             </button>
@@ -44,10 +44,10 @@
             </div>
         </header>
 
-        <div>
+        <div class="body-content">
             <login v-if="showComponents.login" @login="login" @register="register" ></login>
-            <newproduct v-if="showComponents.newproduct" ></newproduct>
-            <products v-if="showComponents.products" @sendtocart="sendtocart" @editproduct="editproduct" :products="computedProducts" :auth_lvl="computedAuth" :url="url"></products>
+            <newproduct v-if="showComponents.newproduct" @createproduct="createproduct" @addproductbtn="addproductbtn" ></newproduct>
+            <products v-if="showComponents.products" @sendtocart="sendtocart" @editproduct="editproduct" @deleteproduct="deleteproduct" :products="computedProducts" :auth_lvl="computedAuth" :url="url"></products>
             <cart v-if="showComponents.cart" :cart="cart" ></cart>
         </div>
 

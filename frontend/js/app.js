@@ -162,6 +162,7 @@ const myApp = createApp({
         toggleCart() {
             this.showComponents.products = !this.showComponents.products;
             this.showComponents.cart = !this.showComponents.products;
+            this.showComponents.newproduct = false;
         },
         async getCart() {
             try {
@@ -205,11 +206,27 @@ const myApp = createApp({
                 alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
             }
         },
-        addProductBtn() {
+        addproductbtn() {
             this.showComponents.newproduct = !this.showComponents.newproduct;
         },
         async createproduct(product) {
             console.log('crear: ', product);
+            try {
+                const resp = await axios.post(`${this.url}/products`, product, {headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
+
+                console.log(resp.data.message);
+
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                this.products = [...this.products ,resp.data.product];
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
+            }
         },
         async editproduct(product) {
             try {
@@ -228,6 +245,26 @@ const myApp = createApp({
 
                 this.products = this.products.map((p) => p.id === updatedProduct.id ? updatedProduct : p);
 
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
+            }
+        },
+        async deleteproduct(productId) {
+            console.log(productId)
+            try {
+                const resp = await axios.delete(`${this.url}/products/${productId}`, {headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
+
+                console.log(resp.data.message);
+
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                this.products = this.products.filter((p) => p.id !== productId);
+                
             } catch (err) {
                 console.log(err);
                 alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');

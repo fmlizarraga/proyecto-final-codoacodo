@@ -4,9 +4,40 @@
     max-width: 100%;
 }
 
+header {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
 footer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+.img-preview {
+    max-width: 150px;
+    max-height: 150px;
+}
+
+.bottom-border {
+    border-bottom: 3px double #ccc;
+    padding-bottom: 20px;
+}
+
+.body-content {
+    margin-top: 90px;
+    margin-bottom: 60px;
+}
+
+.add-product-form {
+    position: fixed;
+    left: 50px;
+    right: 50px;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.938);
 }
