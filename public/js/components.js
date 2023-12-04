@@ -63,6 +63,42 @@ const loginForm = {
     }
 }
 
+const orderPage = {
+    template: `
+    <div class="container mt-4">
+        <h2 class="mb-4">Detalles del Pedido</h2>
+        <div class="mb-4">
+        <p class="fw-bold">ID de Pedido: {{ order.order_id }}</p>
+        <p class="fw-bold">Fecha del Pedido: {{ formatDate(order.order_date) }}</p>
+        </div>
+            <div v-for="(detail, index) in order.details" :key="index" class="mb-4">
+            <h3 class="mb-3">Detalle {{ index + 1 }}</h3>
+            <div class="row">
+                <div class="col-md-3">
+                <img :src="detail.product.img_url" alt="Product Image" class="img-fluid" style="max-width: 100px; max-height: 100px;">
+                </div>
+                <div class="col-md-9">
+                <p class="fw-bold">Descripción: {{ detail.product.description }}</p>
+                <p class="fw-bold">Precio: $ {{ parseFloat(detail.product.price).toFixed(2) }}</p>
+                <p class="fw-bold">Cantidad: {{ detail.quantity }}</p>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary" @click="acceptOrder">Aceptar</button>
+    </div>
+    `,
+    props: ['order'],
+    methods: {
+        formatDate(dateString) {
+            const formattedDate = new Date(dateString).toISOString()
+            return formattedDate;
+        },
+        acceptOrder() {
+            this.$emit('toggleorder');
+        }
+    }
+}
+
 const cartPage = {
     template: `
     <div class="container animate__animated animate__fadeInRight">

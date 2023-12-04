@@ -5,7 +5,8 @@ const myApp = createApp({
         'login': loginForm,
         'products': productsList,
         'cart': cartPage,
-        'newproduct': newProductForm
+        'newproduct': newProductForm,
+        'neworder': orderPage
     },
     data() {
         return {
@@ -21,12 +22,14 @@ const myApp = createApp({
             products: [],
             formFilter: '',
             cart: [],
+            myorder: {},
             orders: [],
             showComponents: {
                 login: false,
                 products: false,
                 cart: false,
-                newproduct: false
+                newproduct: false,
+                myorder: false
             },
             currentRoute: '/',
         }
@@ -47,6 +50,9 @@ const myApp = createApp({
             // Devuelve los productos actualizados
             return this.products;
         },
+        computedOrder() {
+            return this.myorder;
+        },
         computedAuth() {
             return this.user.auth_lvl;
         },
@@ -61,6 +67,7 @@ const myApp = createApp({
         }
     },
     methods: {
+        // Metodos para el enrutado SPA
         navigateTo(route) {
             this.currentRoute = route;
             this.loadContent(route);
@@ -71,11 +78,20 @@ const myApp = createApp({
             console.log('Cargando contenido para la ruta:', route);
         },
         // Metodos basicos de UI
+        toggleorder() {
+            this.showComponents.myorder = !this.showComponents.myorder;
+            this.showComponents.products = !this.showComponents.myorder;
+            this.showComponents.newproduct = false;
+            this.showComponents.cart = false;
+            if(this.showComponents.products) this.navigateTo('/products');
+            if(this.showComponents.myorder) this.navigateTo('/order-details');
+        },
         toggleCart() {
             this.formFilter = '';
             this.showComponents.products = !this.showComponents.products;
             this.showComponents.cart = !this.showComponents.products;
             this.showComponents.newproduct = false;
+            this.showComponents.myorder = false;
             if(this.showComponents.products) this.navigateTo('/products');
             if(this.showComponents.cart) this.navigateTo('/cart');
         },
@@ -99,6 +115,7 @@ const myApp = createApp({
             this.showComponents.products = false;
             this.showComponents.cart = false;
             this.showComponents.newproduct = false;
+            this.showComponents.myorder = false;
 
             localStorage.clear();
             
@@ -347,7 +364,26 @@ const myApp = createApp({
         },
         // Ordenes de compra
         async crearorden() {
-            console.log("orden creada!");
+            try {
+                const resp = await axios.put(`${this.url}/orders`, {body:'none'}, {headers:{"Authorization":`Bearer ${this.token}`}});
+                const isOk = resp.data.ok;
+
+                console.log(resp.data.message);
+
+                if(!isOk) {
+                    alert('Hubo un problema al efectuar la operacion, por favor, intente de nuevo mas tarde.');
+                    return;
+                }
+
+                this.cart = [];
+
+                this.myorder = resp.data.order;
+
+                this.toggleorder();
+            } catch (err) {
+                console.log(err);
+                alert('Hubo un problema y no se pudo completar la operacion, por favor intente mas tarde.');
+            }
         },
     }
 })

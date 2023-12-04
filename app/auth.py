@@ -37,6 +37,7 @@ def requires_authorization(func):
 
         # Si el encabezado no está presente o no tiene el formato correcto,
         # abortar la solicitud con un código de estado 401
+        print('falta el token!')
         response = jsonify({"ok": False, "message": "No autorizado"})
         response.status_code = 401
         return response
@@ -46,6 +47,7 @@ def requires_authorization(func):
 # Función para verificar la autenticación
 def verify_auth(token):
     try:
+        print('decodificando token...')
         # Decodificar el token
         decoded_token = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
         user_id = decoded_token['user_id']
@@ -59,7 +61,9 @@ def verify_auth(token):
         #     request.auth_lvl = auth_lvl
         #     return True
         user = userDAO.fetch_by_id(user_id)
+        print(user)
         if not user == None:
+            print('usuario existe')
             request.user_id = user_id
             request.auth_lvl = user['auth_lvl']
             return True
