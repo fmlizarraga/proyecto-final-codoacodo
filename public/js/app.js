@@ -178,7 +178,6 @@ const myApp = createApp({
                     this.showComponents.products = true
                     this.status = 'logged';
                 }
-                console.log(this.user)
             } catch (err) {
                 console.log(err);
                 alert('Su secion expiro y se ha cerrado.')

@@ -486,7 +486,7 @@ const productItem = {
             <p class="card-text">{{ product.description }}</p>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Precio: $ {{ product.price }}</li>
+            <li class="list-group-item">Precio: $ {{ parseFloat(product.price).toFixed(2) }}</li>
             <li class="list-group-item">Origen: {{ getCountryName(product.origin) }}</li>
         </ul>
         <div v-if="!settingQuant" class="card-body d-flex justify-content-between">
