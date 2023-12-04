@@ -50,4 +50,5 @@ footer {
 .login {
     position: fixed;
     top: 20%;
+    max-width: 100%;
 }

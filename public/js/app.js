@@ -28,6 +28,7 @@ const myApp = createApp({
                 cart: false,
                 newproduct: false
             },
+            currentRoute: '/',
         }
     },
     mounted() {
@@ -39,6 +40,7 @@ const myApp = createApp({
             this.showComponents.cart = false;
             this.showComponents.newproduct = false;
         }
+        this.navigateTo('/');
     },
     computed: {
         computedProducts() {
@@ -59,12 +61,23 @@ const myApp = createApp({
         }
     },
     methods: {
+        navigateTo(route) {
+            this.currentRoute = route;
+            this.loadContent(route);
+
+            window.history.pushState(null, null, route);
+        },
+        loadContent(route) {
+            console.log('Cargando contenido para la ruta:', route);
+        },
         // Metodos basicos de UI
         toggleCart() {
             this.formFilter = '';
             this.showComponents.products = !this.showComponents.products;
             this.showComponents.cart = !this.showComponents.products;
             this.showComponents.newproduct = false;
+            if(this.showComponents.products) this.navigateTo('/products');
+            if(this.showComponents.cart) this.navigateTo('/cart');
         },
         addproductbtn() {
             this.formFilter = '';
@@ -88,6 +101,8 @@ const myApp = createApp({
             this.showComponents.newproduct = false;
 
             localStorage.clear();
+            
+            this.navigateTo('/');
         },
         // Llamadas al Backend
         // Acciones de usuario - autorizacion
@@ -113,6 +128,7 @@ const myApp = createApp({
 
                 this.showComponents.login = false
                 this.showComponents.products = true
+                this.navigateTo('/products');
             } catch (err) {
                 console.log(err);
                 alert('No se pudo completar la operacion, por favor intente mas tarde.');
@@ -152,6 +168,8 @@ const myApp = createApp({
                 this.token = resp.data.token;
                 localStorage.setItem('token', resp.data.token);
                 
+                this.navigateTo('/products');
+
                 this.user = resp.data.user;
                 if (this.status !== 'logged') {
                     await this.getProducts();
