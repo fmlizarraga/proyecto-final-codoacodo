@@ -36,6 +36,14 @@ Tienda online de productos importados.
   - Git para el desarrollo en equipo
   - PHP MyAdmin para comprobaciones en la base de datos
 
+- **Variables de entorno necesarias para ejecutar el backend**
+  - [MYSQL_HOST] URL del servidor de mySQL
+  - [MYSQL_USER] Usuario de mySQL
+  - [MYSQL_PASS] Contraseña de mySQL
+  - [MYSQL_DB] Base de datos
+  - [JWT_SECRET] Una cadena de caracteres segura que se usa como clave para firmar los tokens
+  - Consultar archivo .env.example
+
 - **Rutas para Autenticación**
   - `/api/auth` [GET] (Verificar token)
   - `/api/auth` [POST] (Inicio de sesión)
